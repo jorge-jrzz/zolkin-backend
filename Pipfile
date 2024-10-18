@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+ipykernel = "*"
+google-api-python-client = "*"
+google-auth-httplib2 = "*"
+google-auth-oauthlib = "*"
+langchain = "*"
+langchain-openai = "*"
+langchain-google-community = {extras = ["gmail"], version = "*"}
+langgraph = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
