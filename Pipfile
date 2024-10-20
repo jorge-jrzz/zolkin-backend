@@ -8,11 +8,13 @@ ipykernel = "*"
 google-api-python-client = "*"
 google-auth-httplib2 = "*"
 google-auth-oauthlib = "*"
+pytz = "*"
+redis = "*"
 langchain = "*"
+langgraph = "*"
 langchain-openai = "*"
 langchain-google-community = {extras = ["gmail"], version = "*"}
-langgraph = "*"
-pytz = "*"
+langchain-redis = "*"
 
 [dev-packages]
 
