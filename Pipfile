@@ -12,6 +12,7 @@ langchain = "*"
 langchain-openai = "*"
 langchain-google-community = {extras = ["gmail"], version = "*"}
 langgraph = "*"
+pytz = "*"
 
 [dev-packages]
 
