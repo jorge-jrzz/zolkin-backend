@@ -1,4 +1,5 @@
 from .gmail import get_gmail_toolkit
+from .calendar import get_calendar_toolkit
 from typing import List, Any
 from langchain_google_community.gmail.utils import (
     build_resource_service,
@@ -22,7 +23,9 @@ def build_service(scopes: List[str],
 
 def get_agent_toolkit() -> List[Any]:
     api_resource = build_service(scopes=SCOPES)
-    return get_gmail_toolkit(api_resource=api_resource)
+    gmail_toolkit = get_gmail_toolkit(api_resource=api_resource)
+    calendar_toolkit = get_calendar_toolkit(api_resource=api_resource)
+    return gmail_toolkit + calendar_toolkit
 
 
 
