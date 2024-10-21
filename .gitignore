@@ -164,5 +164,5 @@ cython_debug/
 # MacOS stuff
 .DS_Store
 
-# GCP Token
-token.json
+# GCP secrets
+secrets/
