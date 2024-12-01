@@ -4,19 +4,20 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-ipykernel = "*"
+flask = "*"
+flask-cors = "*"
+authlib = "*"
 google-api-python-client = "*"
 google-auth-httplib2 = "*"
 google-auth-oauthlib = "*"
-pytz = "*"
-redis = "*"
-langchain = "*"
 langgraph = "*"
 langchain-openai = "*"
-langchain-google-community = {extras = ["gmail"], version = "*"}
 langchain-redis = "*"
+langchain-milvus = "*"
+langchain-community = { git = "https://github.com/jorge-jrzz/langchain_gcalendar.git", ref = "google_calendar", subdirectory = "libs/community" }
 
 [dev-packages]
+ipykernel = "*"
 
 [requires]
 python_version = "3.12"
