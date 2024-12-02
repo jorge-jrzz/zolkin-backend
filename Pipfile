@@ -4,12 +4,14 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+python-dotenv = "*"
 flask = "*"
 flask-cors = "*"
 authlib = "*"
 google-api-python-client = "*"
 google-auth-httplib2 = "*"
 google-auth-oauthlib = "*"
+pymupdf = "*"
 langgraph = "*"
 langchain-openai = "*"
 langchain-redis = "*"
