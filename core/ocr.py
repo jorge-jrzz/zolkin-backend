@@ -11,13 +11,12 @@ from langchain_core.documents import Document
 
 class LoadFile:
     @staticmethod
-    def ocr_pdf(input_pdf: str, output_pdf: str , language='eng+spa') -> None:
+    def ocr_pdf(input_pdf: str, language='eng+spa') -> None:
         """
         Adds an OCR text layer to scanned PDF files, allowing them to be searched using OCRmyPDF.
 
         Args: 
             input_pdf (str): The path to the input PDF file.
-            output_pdf (str): The path to the output PDF file.
             language (str): The language(s) to use for OCR. Default is 'eng+spa' (English and Spanish).
         
         Returns:
@@ -32,12 +31,12 @@ class LoadFile:
                 '--jobs', '6',  # Número de trabajos en paralelo
                 '--output-type', 'pdf',
                 input_pdf,
-                output_pdf
+                input_pdf   # Sobreescribir el archivo de entrada
             ]
 
             # Ejecutar el comando
             subprocess.run(comando, check=True)
-            print(f"OCR aplicado exitosamente a {input_pdf}. Salida: {output_pdf}")
+            print(f"OCR aplicado exitosamente a {input_pdf}.")
         except subprocess.CalledProcessError as e:
             print(f"Error al aplicar OCR: {e}")
 
