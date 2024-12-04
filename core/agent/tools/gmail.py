@@ -1,5 +1,5 @@
 from typing import Any, List
-from langchain_google_community import GmailToolkit
+from langchain_community.agent_toolkits import GmailToolkit
 
 
 def get_gmail_toolkit(api_resource: Any) -> List[Any]:
