@@ -1,0 +1,17 @@
+python-dotenv>=1.0
+requests>=2.32
+flask>=3.0
+flask-cors>=5.0
+authlib>=1.3
+google-api-python-client>=2.122
+google-auth-httplib2>=0.1
+google-auth-oauthlib>=1.2
+pymupdf>=1.0
+pymilvus>=2.5
+redis>=5.0
+langchain-core>=0.3
+langchain-openai>=0.2
+langchain-redis>=0.1
+langchain-milvus>=0.1
+langgraph>=0.2
+git+https://github.com/jorge-jrzz/langchain_gcalendar.git@google_calendar#egg=langchain-community&subdirectory=libs/community

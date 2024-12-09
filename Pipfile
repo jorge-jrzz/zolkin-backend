@@ -6,20 +6,25 @@ name = "pypi"
 [packages]
 python-dotenv = "*"
 flask = "*"
+requests = "*"
 flask-cors = "*"
 authlib = "*"
 google-api-python-client = "*"
 google-auth-httplib2 = "*"
 google-auth-oauthlib = "*"
 pymupdf = "*"
-langgraph = "*"
+pymilvus = "*"
+redis = "*"
+langchain-core = "*"
 langchain-openai = "*"
 langchain-redis = "*"
 langchain-milvus = "*"
 langchain-community = { git = "https://github.com/jorge-jrzz/langchain_gcalendar.git", ref = "google_calendar", subdirectory = "libs/community" }
+langgraph = "*"
 
 [dev-packages]
 ipykernel = "*"
+ruff = "*"
 
 [requires]
 python_version = "3.12"
