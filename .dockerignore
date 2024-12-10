@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+Pipfile
+Pipfile.lock
+
+# virtualenv
+venv/
+.env/
+*.env
+*.env.*
+
+# Configurations
+.vscode/
+.idea/
+*.iml
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile~
+docker-compose.override.yml
+
+# Directories and files without impact on production
+.ruff_cache/
+milvus/
+notebooks/
+pdfs/
+secrets/
+uploads/
+volumes/
+LICENSE
+README.md
