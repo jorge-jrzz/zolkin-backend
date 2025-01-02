@@ -1,20 +1,26 @@
+"""ZolklinAgent class definition."""
+
 import os
-from dotenv import load_dotenv
 from typing import Any, List, Set
-from langchain_openai import ChatOpenAI
-from google.oauth2.credentials import Credentials
-from core.agent.tools import get_google_toolkit
-from core.agent.tools import MilvusStorage
+
+from dotenv import load_dotenv
+from pymilvus import Collection, connections
 from langchain_milvus import Milvus
+from langchain_openai import ChatOpenAI
 from langchain_core.tools.simple import Tool
+from langchain_core.messages import SystemMessage
 from langgraph.prebuilt import create_react_agent
-from pymilvus import MilvusClient, Collection, connections, utility
-from langchain_core.messages import HumanMessage, SystemMessage
+from google.oauth2.credentials import Credentials
+
+from core.agent.tools import MilvusStorage, get_google_toolkit
 from core.agent.memory import RedisSaver
+
 
 load_dotenv()
 
+
 class ZolkinAgent:
+    """ZolkinAgent class."""
     def __init__(self, 
                 google_creds: Credentials,
                 milvus_conn: MilvusStorage,
