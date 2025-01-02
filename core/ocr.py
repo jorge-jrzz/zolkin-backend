@@ -1,22 +1,23 @@
 """
-This module provides functionalities for Optical Character Recognition (OCR) and text extraction from PDF files.
+Functionalities for Optical Character Recognition (OCR) and text extraction from PDF files.
 """
 
 import subprocess
 from pathlib import Path
 from typing import List
+
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_core.documents import Document
 
 
 class LoadFile:
     @staticmethod
-    def ocr_pdf(input_pdf: str, language='eng+spa') -> None:
+    def ocr_pdf(input_pdf: str, language: str = 'eng+spa') -> None:
         """
         Adds an OCR text layer to scanned PDF files, allowing them to be searched using OCRmyPDF.
 
         Args: 
-            input_pdf (str): The path to the input PDF file.
+            input_pdf (str): The path to the input and output PDF file.
             language (str): The language(s) to use for OCR. Default is 'eng+spa' (English and Spanish).
         
         Returns:
@@ -33,7 +34,6 @@ class LoadFile:
                 input_pdf,
                 input_pdf   # Sobreescribir el archivo de entrada
             ]
-
             # Ejecutar el comando
             subprocess.run(comando, check=True)
             print(f"OCR aplicado exitosamente a {input_pdf}.")
