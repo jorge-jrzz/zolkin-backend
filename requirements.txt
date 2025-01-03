@@ -1,5 +1,4 @@
 python-dotenv>=1.0
-requests>=2.32
 flask>=3.0
 flask-cors>=5.0
 authlib>=1.3
