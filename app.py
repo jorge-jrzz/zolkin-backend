@@ -16,6 +16,9 @@ from core import get_google_creds, manage_files, LoadFile, ZolkinAgent, MilvusSt
 
 
 load_dotenv()
+BASE_DIR = "/app/"
+UPLOAD_FOLDER = BASE_DIR+'files/uploads/'
+PDFS_FOLDER = BASE_DIR+'files/pdfs/'
 SCOPES = [
     "https://mail.google.com/", 
     "https://www.googleapis.com/auth/calendar", 
@@ -24,13 +27,12 @@ SCOPES = [
     "profile"
 ]
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
-UPLOAD_FOLDER = './uploads/'
 ALLOWED_EXTENSIONS = [
     'pdf', 'png', 'jpg', 'jpeg', 'ppt', 'pptx', 'doc', 'docx'
 ]
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY")
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'default_secret_key')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 oauth = OAuth(app)
 CORS(app, resources={r"/*": {"origins": os.getenv('FRONTEND_URL')}}, supports_credentials=True)
@@ -98,11 +100,11 @@ def upload_file():
         path_file = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(path_file)
         # Empieza RAG
-        os.makedirs(os.path.dirname("pdfs/"), exist_ok=True)
-        manage_files(path_file, dst_path=f"./pdfs/{filename}")
-        LoadFile.ocr_pdf(f"./pdfs/{filename}")
+        os.makedirs(os.path.dirname(PDFS_FOLDER), exist_ok=True)
+        pdf_file = manage_files(path_file, outdir=PDFS_FOLDER)
+        LoadFile.ocr_pdf(pdf_file)
         file_content = LoadFile.load_file(
-            file_path=f"./pdfs/{filename}", 
+            file_path=pdf_file,
             namespace=user_info_data["email"]
         )
         milvus_conn.upsert_files(milvus_storage, file_content)
@@ -135,7 +137,8 @@ def google():
 def google_auth():
     """Endpoint to authenticate the user with Google."""
     token = oauth.google.authorize_access_token()
-    token_file= f"./secrets/{token["userinfo"]["email"].rsplit('@', 1)[0].lower()}.json"
+    user_mail = token["userinfo"]["email"].rsplit('@', 1)[0].lower()
+    token_file= f"./secrets/{user_mail}.json"
     os.makedirs(os.path.dirname("secrets/"), exist_ok=True)
     creds = get_google_creds(token_file, token, SCOPES)
     user_info_data = {
