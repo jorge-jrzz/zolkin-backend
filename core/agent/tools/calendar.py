@@ -1,7 +1,9 @@
+"""Google Calendar Toolkit."""
 from typing import Any, List
-from langchain_community.agent_toolkits import GoogleCalendarToolkit
+
+from langchain_google_community import CalendarToolkit
 
 
 def get_calendar_toolkit(api_resource: Any) -> List[Any]:
-    toolkit = GoogleCalendarToolkit(api_resource=api_resource)
+    toolkit = CalendarToolkit(api_resource=api_resource)
     return toolkit.get_tools()
