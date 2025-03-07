@@ -1,7 +1,6 @@
 """
 Functionalities for Optical Character Recognition (OCR) and text extraction from PDF files.
 """
-
 import subprocess
 from pathlib import Path
 from typing import List
@@ -12,27 +11,30 @@ from langchain_core.documents import Document
 
 class LoadFile:
     @staticmethod
-    def ocr_pdf(input_pdf: str, language: str = 'eng+spa') -> None:
+    def ocr_pdf(input_pdf: str, language: str = "eng+spa") -> None:
         """
         Adds an OCR text layer to scanned PDF files, allowing them to be searched using OCRmyPDF.
 
-        Args: 
+        Args:
             input_pdf (str): The path to the input and output PDF file.
             language (str): The language(s) to use for OCR. Default is 'eng+spa' (English and Spanish).
-        
+
         Returns:
             None
         """
         try:
             # Construir el comando
             comando = [
-                'ocrmypdf',
-                '-l', language,
-                '--force-ocr',
-                '--jobs', '6',  # Número de trabajos en paralelo
-                '--output-type', 'pdf',
+                "ocrmypdf",
+                "-l",
+                language,
+                "--force-ocr",
+                "--jobs",
+                "6",  # Número de trabajos en paralelo
+                "--output-type",
+                "pdf",
                 input_pdf,
-                input_pdf   # Sobreescribir el archivo de entrada
+                input_pdf,  # Sobreescribir el archivo de entrada
             ]
             # Ejecutar el comando
             subprocess.run(comando, check=True)
@@ -57,10 +59,10 @@ class LoadFile:
         file_content = []
         for doc in loader.lazy_load():
             doc.metadata = {
-                'namespace': namespace,
-                'source': source,
-                'page': doc.metadata['page'],
-                'author': doc.metadata['author'],
+                "namespace": namespace,
+                "source": source,
+                "page": doc.metadata["page"],
+                "author": doc.metadata["author"],
             }
             file_content.append(doc)
 

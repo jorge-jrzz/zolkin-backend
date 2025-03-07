@@ -1,25 +1,24 @@
 """
 This module contains the Strategy pattern implementation for the file management system.
 """
-
 from __future__ import annotations
-from abc import ABC, abstractmethod
+import shutil
+import mimetypes
+import subprocess
 from pathlib import Path
 from typing import Optional
-import subprocess
-import mimetypes
-import shutil
+from abc import ABC, abstractmethod
 
 
 class Strategy(ABC):
     """Strategy interface."""
     @abstractmethod
     def execute(self, input_file: str, outdir: str) -> Optional[str]:
-        """Execute the strategy. """
+        """Execute the strategy."""
 
 
 class AcceptedFiles(Strategy):
-    """ 
+    """
     AcceptedFiles strategy.
     This strategy only moves the file to the destination path directory.
     """
@@ -45,24 +44,28 @@ class Another(Strategy):
         """Execute the strategy (Another)."""
         mime_type, _ = mimetypes.guess_type(input_file)
         try:
-            if mime_type.startswith('image'):
-                subprocess.run([
-                    'convert',
-                    input_file,
-                    f'{outdir}/{Path(input_file).stem}.pdf'
-                ], check=True)
+            if mime_type.startswith("image"):
+                subprocess.run(
+                    ["convert", input_file, f"{outdir}/{Path(input_file).stem}.pdf"],
+                    check=True,
+                )
             else:
-                subprocess.run([
-                    'soffice',
-                    '--headless',
-                    '--convert-to', 'pdf',
-                    '--outdir', outdir,
-                    input_file
-                ], check=True)
+                subprocess.run(
+                    [
+                        "soffice",
+                        "--headless",
+                        "--convert-to",
+                        "pdf",
+                        "--outdir",
+                        outdir,
+                        input_file,
+                    ],
+                    check=True,
+                )
         except subprocess.CalledProcessError as e:
             print(f"Error converting file: {e}")
             return None
-        return Path(f'{outdir}/{Path(input_file).stem}.pdf').as_posix()
+        return Path(f"{outdir}/{Path(input_file).stem}.pdf").as_posix()
 
 
 class FileManager:
@@ -74,7 +77,7 @@ class FileManager:
     def strategy(self) -> Strategy:
         """Get the strategy."""
         return self._strategy
-    
+
     @strategy.setter
     def strategy(self, strategy: Strategy) -> None:
         """Set the strategy."""
@@ -92,7 +95,7 @@ class FileManager:
             Optional[str]: The path to the output file.
         """
         return self._strategy.execute(input_file, outdir)
- 
+
 
 def manage_files(input_file: str, outdir: str) -> Optional[str]:
     """
@@ -104,7 +107,7 @@ def manage_files(input_file: str, outdir: str) -> Optional[str]:
     """
     context = FileManager()
     mime_type, _ = mimetypes.guess_type(input_file)
-    if mime_type == 'application/pdf':
+    if mime_type == "application/pdf":
         context.strategy = AcceptedFiles()
     else:
         context.strategy = Another()
