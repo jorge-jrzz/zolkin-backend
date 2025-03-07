@@ -1,8 +1,7 @@
-from contextlib import asynccontextmanager, contextmanager
+"""Memory-based checkpoint saver implementation in Redis."""
+from contextlib import contextmanager
 from typing import (
     Any,
-    AsyncGenerator,
-    AsyncIterator,
     Iterator,
     List,
     Optional,
@@ -10,29 +9,27 @@ from typing import (
 )
 
 from langchain_core.runnables import RunnableConfig
-
 from langgraph.checkpoint.base import (
     BaseCheckpointSaver,
     ChannelVersions,
     Checkpoint,
     CheckpointMetadata,
     CheckpointTuple,
-    PendingWrite,
     get_checkpoint_id,
 )
-from langgraph.checkpoint.serde.base import SerializerProtocol
 from redis import Redis
-from redis.asyncio import Redis as AsyncRedis
+
 from .utils import (
-    _make_redis_checkpoint_key, 
+    _make_redis_checkpoint_key,
     _make_redis_checkpoint_writes_key,
-    _parse_redis_checkpoint_key, 
-    _parse_redis_checkpoint_writes_key, 
-    _filter_keys, 
+    _parse_redis_checkpoint_key,
+    _parse_redis_checkpoint_writes_key,
+    _filter_keys,
     _dump_writes,
     _load_writes,
-    _parse_redis_checkpoint_data
+    _parse_redis_checkpoint_data,
 )
+
 
 class RedisSaver(BaseCheckpointSaver):
     """Redis-based checkpoint saver implementation."""
