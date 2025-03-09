@@ -6,9 +6,10 @@ __pycache__/
 Pipfile
 Pipfile.lock
 uv.lock
+.python-version
+pyproject.toml
 
 # virtualenv
-.python-version
 venv/
 .env/
 *.env
