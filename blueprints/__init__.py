@@ -1,3 +1,5 @@
+"""Blueprints for the application."""
+
 from .auth import auth_bp
 from .files import files_bp
 from .chat import chat_bp
