@@ -2,12 +2,17 @@
 This module contains the Strategy pattern implementation for the file management system.
 """
 from __future__ import annotations
+import logging
 import shutil
 import mimetypes
 import subprocess
 from pathlib import Path
 from typing import Optional
 from abc import ABC, abstractmethod
+
+
+# Configuración del logger para este módulo
+logger = logging.getLogger(__name__)
 
 
 class Strategy(ABC):
@@ -20,34 +25,40 @@ class Strategy(ABC):
 class AcceptedFiles(Strategy):
     """
     AcceptedFiles strategy.
-    This strategy only moves the file to the destination path directory.
+    This strategy only moves the file to the destination directory.
     """
     def execute(self, input_file: str, outdir: str) -> Optional[str]:
         """Execute the strategy (AcceptedFiles)."""
         try:
-            output_path = shutil.move(input_file, f"{outdir}/{Path(input_file).name}")
+            input_path = Path(input_file)
+            destination = Path(outdir) / input_path.name
+            output_path = shutil.move(str(input_path), str(destination))
+            return Path(output_path).as_posix()
         except shutil.Error as e:
-            print(f"Error moving file: {e}")
+            logger.error(f"Error moving file '{input_file}' to '{outdir}': {e}")
             return None
-        return Path(output_path).as_posix()
 
 
 class Another(Strategy):
     """
     Another strategy.
-    This strategy converts the file to PDF
-    - Using LibreOffice if the file is a document (LibreOffice have to donwloaded in Docker container).
-    - Using ImageMagick if the file is an image. (ImageMagick have to donwloaded in Docker container).
-    And saves it to the destination directory.
+    This strategy converts the file to PDF:
+      - Using ImageMagick if the file is an image (ImageMagick must be installed in the Docker container).
+      - Using LibreOffice if the file is a document (LibreOffice must be installed in the Docker container).
+    And saves the converted file to the destination directory.
     """
     def execute(self, input_file: str, outdir: str) -> Optional[str]:
         """Execute the strategy (Another)."""
+        input_path = Path(input_file)
+        destination_pdf = Path(outdir) / f"{input_path.stem}.pdf"
         mime_type, _ = mimetypes.guess_type(input_file)
         try:
-            if mime_type.startswith("image"):
+            if mime_type and mime_type.startswith("image"):
                 subprocess.run(
-                    ["convert", input_file, f"{outdir}/{Path(input_file).stem}.pdf"],
+                    ["magick", str(input_path), str(destination_pdf)],
                     check=True,
+                    capture_output=True,
+                    text=True,
                 )
             else:
                 subprocess.run(
@@ -57,15 +68,18 @@ class Another(Strategy):
                         "--convert-to",
                         "pdf",
                         "--outdir",
-                        outdir,
-                        input_file,
+                        str(outdir),
+                        str(input_path),
                     ],
                     check=True,
+                    capture_output=True,
+                    text=True,
                 )
         except subprocess.CalledProcessError as e:
-            print(f"Error converting file: {e}")
+            error_msg = e.stderr if e.stderr else str(e)
+            logger.error(f"Error converting file '{input_file}' to PDF: {error_msg}")
             return None
-        return Path(f"{outdir}/{Path(input_file).stem}.pdf").as_posix()
+        return destination_pdf.as_posix()
 
 
 class FileManager:
@@ -89,11 +103,14 @@ class FileManager:
 
         Args:
             input_file (str): The path to the input file.
-            outdir str: The path to the destination directory.
+            outdir (str): The path to the destination directory.
 
         Returns:
             Optional[str]: The path to the output file.
         """
+        if self._strategy is None:
+            logger.error("No strategy set for FileManager")
+            return None
         return self._strategy.execute(input_file, outdir)
 
 
@@ -104,6 +121,9 @@ def manage_files(input_file: str, outdir: str) -> Optional[str]:
     Args:
         input_file (str): The path to the source file.
         outdir (str): The path to the destination directory.
+
+    Returns:
+        Optional[str]: The path to the processed file.
     """
     context = FileManager()
     mime_type, _ = mimetypes.guess_type(input_file)
