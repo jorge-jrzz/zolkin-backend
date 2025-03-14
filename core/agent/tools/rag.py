@@ -2,6 +2,7 @@
 import os
 import json
 import hashlib
+import logging
 from typing import Optional, List
 
 from pymilvus import MilvusClient
@@ -12,20 +13,22 @@ from langchain_core.documents import Document
 from langchain.tools.retriever import create_retriever_tool
 
 
+# Configuración del logger
+logger = logging.getLogger(__name__)
+
+
 class MilvusStorage:
     def __init__(self, collection_name):
-        self.milvus_url = os.getenv("MILVUS_URL")
+        self.milvus_url = os.getenv("MILVUS_URL", "http://localhost:19530")
         self.embeddings_model = OpenAIEmbeddings(
             model=os.getenv("EMBEDDINGS_MODEL"), api_key=os.getenv("OPENAI_API_KEY")
         )
         self.collection_name = collection_name
 
-
     def _deterministic_hash(self, text: str) -> str:
         text_bytes = text.encode("utf-8")
         hash_object = hashlib.sha256(text_bytes)
         return hash_object.hexdigest()
-
 
     def _delete_by_ids(self, ids: List[str]) -> None:
         try:
@@ -35,18 +38,17 @@ class MilvusStorage:
             if len(res) != 0:
                 client.delete(collection_name=self.collection_name, ids=ids)
             else:
-                print("No documents to delete.")
+                logger.info("No documents to delete.")
                 return
             client.close()
         except Exception as e:
-            print(f"Error deleting documents by ids: {e}")
-
+            logger.error("Error deleting documents by ids: %s", e)
 
     def use_collection(
         self, partition_key_field: str = "namespace"
     ) -> Optional[Milvus]:
         try:
-            print(f"Intentando conectar a Milvus en: {self.milvus_url}")
+            logger.info("Intentando conectar a Milvus en: %s", self.milvus_url)
             vector_storage = Milvus(
                 embedding_function=self.embeddings_model,
                 collection_name=self.collection_name,
@@ -57,7 +59,7 @@ class MilvusStorage:
                 index_params={"metric_type": "COSINE"},
                 partition_key_field=partition_key_field,
             )
-            print("Conexión establecida, añadiendo documento dummy")
+            logger.info("Conexión establecida, añadiendo documento dummy")
             vector_storage.add_documents(
                 documents=[
                     Document(
@@ -74,15 +76,14 @@ class MilvusStorage:
             )
             return vector_storage
         except Exception as e:
-            print(f"Error al conectar a Milvus: {type(e).__name__} - {str(e)}")
+            logger.error("Error al conectar a Milvus: %s - %s", type(e).__name__, str(e))
             return None
-
 
     def upsert_files(
         self, vectorstore: Milvus, docs: List[Document]
     ) -> Optional[List[str]]:
         if docs is None or len(docs) == 0:
-            print("No documents to upsert.")
+            logger.info("No documents to upsert.")
             return None
         try:
             uuids = [self._deterministic_hash(json.dumps(doc.metadata)) for doc in docs]
@@ -90,15 +91,14 @@ class MilvusStorage:
             ids = vectorstore.add_documents(docs, ids=uuids)
             return ids
         except Exception as e:
-            print(f"Error upserting documents: {e}")
+            logger.error("Error upserting documents: %s", e)
             return None
-
 
     def create_retriver_tool(
         self, vectorstore: Milvus, namespace: str
     ) -> Optional[Tool]:
         if vectorstore is None:
-            print("Error: vectorstore es None, no se puede crear el retriever")
+            logger.error("Error: vectorstore es None, no se puede crear el retriever")
             return None
         try:
             retriever = vectorstore.as_retriever(
@@ -114,5 +114,5 @@ class MilvusStorage:
             )
             return retriever_tool
         except Exception as e:
-            print(f"Error creando RAG: {e}")
+            logger.error("Error creando RAG: %s", e)
             return None
