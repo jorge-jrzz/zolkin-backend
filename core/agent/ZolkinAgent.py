@@ -1,6 +1,8 @@
 """ZolkinAgent class."""
 import os
+import logging
 from typing import Any, List, Set
+from typing_extensions import Self
 
 from pymilvus import Collection, connections
 from langchain_milvus import Milvus
@@ -12,6 +14,10 @@ from google.oauth2.credentials import Credentials
 
 from core.agent.tools import MilvusStorage, get_google_toolkit
 from core.agent.memory import RedisSaver
+
+
+# Configuración del logger
+logger = logging.getLogger(__name__)
 
 
 class ZolkinAgent:
@@ -43,7 +49,6 @@ class ZolkinAgent:
     def _create_google_tools(self) -> List[Tool]:
         return get_google_toolkit(self.google_creds)
 
-
     def _get_unique_filenames(self, namespace: str, collection_name: str) -> Set[str]:
         connections.connect("default", uri=os.getenv("MILVUS_URL"))
         collection = Collection(collection_name)
@@ -54,7 +59,6 @@ class ZolkinAgent:
         connections.disconnect("default")
         return set(names)
 
-
     def update_rag_tool_description(self, namespace: str, collection_name: str) -> str:
         return (
             "A Retrieval Augmented Generation tool using Milvus. "
@@ -62,11 +66,25 @@ class ZolkinAgent:
             f"{self._get_unique_filenames(namespace, collection_name)}"
         )
 
-
-    def init_tools(self) -> Any:
-        self._tools = self._create_google_tools() + self._create_rag_tool()
+    def init_tools(self) -> Self:
+        # Get tools from both sources
+        google_tools = self._create_google_tools()
+        rag_tools = self._create_rag_tool()
+        
+        # Ensure all tools are proper Tool objects
+        self._tools = []
+        for tool in google_tools + rag_tools:
+            if not hasattr(tool, 'name'):
+                # Skip or convert functions to proper Tool objects
+                if callable(tool):
+                    logger.warning(
+                        "Skipping function tool without name attribute: %s",
+                        tool.__name__ if hasattr(tool, '__name__') else str(tool)
+                    )
+                    continue
+            self._tools.append(tool)
+        
         return self
-
 
     def create_agent(self, memory: RedisSaver) -> Any:
         system_message = SystemMessage(
@@ -76,10 +94,13 @@ class ZolkinAgent:
                 "Respond in the same language as the user."
             )
         )
-        print("Herramientas en self._tools:")
+        logger.info("Herramientas en self._tools:")
         for tool in self._tools:
-            print(
-                f"Tipo: {type(tool)}, Tiene 'name': {hasattr(tool, 'name')}, Nombre: {getattr(tool, 'name', 'N/A')}"
+            logger.info(
+                "Tipo: %s, Tiene 'name': %s, Nombre: %s",
+                type(tool),
+                hasattr(tool, 'name'),
+                getattr(tool, 'name', 'N/A')
             )
         return create_react_agent(
             model=self._model,
@@ -87,7 +108,6 @@ class ZolkinAgent:
             state_modifier=system_message,
             checkpointer=memory,
         )
-
 
     def update_rag_description(self, collection_name: str):
         for tool in self._tools:
