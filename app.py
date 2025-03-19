@@ -5,6 +5,7 @@ import logging
 from flask import Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
+from werkzeug.middleware.proxy_fix import ProxyFix
 from authlib.integrations.flask_client import OAuth
 
 from config import DevelopmentConfig
@@ -20,6 +21,7 @@ load_dotenv()
 
 # Inicialización de la app
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.config.from_object(DevelopmentConfig())
 
 handler = logging.StreamHandler()

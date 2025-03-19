@@ -4,3 +4,4 @@ class DevelopmentConfig():
     DEBUG = True
     HOST = '0.0.0.0'
     PORT = 5002
+    PREFERRED_URL_SCHEME = 'https'

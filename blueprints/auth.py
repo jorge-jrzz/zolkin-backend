@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from redis import Redis
 from authlib.common.security import generate_token
@@ -43,14 +44,18 @@ def google():
         server_metadata_url=CONF_URL,
         access_type="offline",
         prompt="consent",
-        client_kwargs={"scope": " ".join(SCOPES)},
+        client_kwargs={
+            "scope": " ".join(SCOPES),
+            "include_granted_scopes": "true"
+        },
     )
     redirect_uri = url_for("google.google_auth", _external=True)
+    current_app.logger.info(f"Redirect URI: {redirect_uri}")
     session["nonce"] = generate_token()
     current_app.logger.debug(f"Generated nonce for session: {session['nonce']}")
     return oauth.google.authorize_redirect(redirect_uri, nonce=session["nonce"])
 
-@auth_bp.route("/google/auth/")
+@auth_bp.route("/auth/")
 def google_auth():
     """Endpoint to authenticate the user with Google."""
     current_app.logger.info("Google authentication callback received")
@@ -68,9 +73,11 @@ def google_auth():
         current_app.logger.error(f"Error extracting user info from token: {e}")
         return "User info extraction failed", 400
 
-    token_file = f"./secrets/{user_mail}.json"
-    secrets_dir = os.path.dirname(token_file)
-    os.makedirs(secrets_dir, exist_ok=True)
+    token_file = Path(f"./secrets/{user_mail}.json")
+    secrets_dir = token_file.parent
+    secrets_dir.mkdir(parents=True, exist_ok=True)
+    if token_file.exists():
+        token_file.unlink()
     try:
         creds = get_google_creds(token_file, token, SCOPES)
         current_app.logger.debug("Google credentials obtained successfully")
