@@ -23,12 +23,18 @@ def chat():
 
     prompt = request.args.get("prompt")
     thread_id = request.args.get("thread_id")
+    use_rag = request.args.get("use_rag", "false").lower() == "true"
+
     if not prompt or not thread_id:
         current_app.logger.warning("Missing prompt or thread_id in request")
         return jsonify({"error": "Missing prompt or thread_id"}), 400
 
     current_app.logger.debug(f"Received prompt: {prompt}, Thread ID: {thread_id}")
     config = {"configurable": {"thread_id": thread_id}}
+
+    if use_rag:
+        prompt = f"Utiliza la herraminta de RAG para responder el siguiente prompt: \n{prompt}"
+        current_app.logger.info("Using RAG tool for chat request")
 
     try:
         response = zolkin_agent.invoke({"messages": [HumanMessage(content=prompt)]}, config)
