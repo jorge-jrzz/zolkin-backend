@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY magick_policy.xml /etc/ImageMagick-6/policy.xml
 WORKDIR /app
-COPY . /app
+COPY app .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
