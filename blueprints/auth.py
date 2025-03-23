@@ -35,6 +35,7 @@ def get_redis_conn():
 @auth_bp.route("/")
 def google():
     """Endpoint to start the Google OAuth2 flow."""
+    session.clear()
     current_app.logger.info("Starting Google OAuth2 flow")
     oauth = current_app.extensions["authlib.integrations.flask_client"]
     oauth.register(
