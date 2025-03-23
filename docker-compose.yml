@@ -36,7 +36,7 @@ services:
       - ETCD_QUOTA_BACKEND_BYTES=4294967296
     volumes:
       - milvus-data:/volumes/etcd:/etcd
-    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    command: etcd -advertise-client-urls=http://etcd:2379 -listen-client-urls=http://0.0.0.0:2379 --data-dir /etcd
     networks:
       - combined_network
 
@@ -71,8 +71,8 @@ services:
     ports:
       - "19530:19530"
     depends_on:
-      - "etcd"
-      - "minio"
+      - etcd
+      - minio
     networks:
       - combined_network
 
