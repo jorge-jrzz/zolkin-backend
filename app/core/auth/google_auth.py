@@ -34,7 +34,7 @@ def get_google_creds(
         else:
             creds = Credentials(
                 token=token_data.get("access_token"),
-                refresh_token=token_data.get("refresh_token", None),
+                refresh_token=token_data.get("refresh_token"),
                 client_id=os.getenv("GOOGLE_CLIENT_ID"),
                 client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
                 token_uri="https://oauth2.googleapis.com/token",

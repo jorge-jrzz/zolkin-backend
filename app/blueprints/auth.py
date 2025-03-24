@@ -40,17 +40,21 @@ def google():
     oauth = current_app.extensions["authlib.integrations.flask_client"]
     oauth.register(
         name="google",
+        server_metadata_url=CONF_URL,
         client_id=os.getenv("GOOGLE_CLIENT_ID"),
         client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
-        server_metadata_url=CONF_URL,
-        access_type="offline",
-        prompt="consent",
-        client_kwargs={"scope": " ".join(SCOPES)},
+        client_kwargs={"scope": " ".join(SCOPES)}
     )
     redirect_uri = url_for("google.google_auth", _external=True)
     session["nonce"] = generate_token()
     current_app.logger.debug(f"Generated nonce for session: {session['nonce']}")
-    return oauth.google.authorize_redirect(redirect_uri, nonce=session["nonce"])
+    
+    return oauth.google.authorize_redirect(
+        redirect_uri,
+        nonce=session["nonce"],
+        access_type="offline",
+        prompt="consent"
+    )
 
 @auth_bp.route("/auth/")
 def google_auth():

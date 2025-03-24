@@ -38,6 +38,14 @@ def chat():
 
     try:
         response = zolkin_agent.invoke({"messages": [HumanMessage(content=prompt)]}, config)
+        # events = zolkin_agent.stream(
+        #     {"messages": [HumanMessage(content=prompt)]},
+        #     config=config,
+        #     stream_mode="values",
+        # )
+        # for event in events:
+        #     event["messages"][-1].pretty_print()
+        #     response = event
     except Exception as e:
         current_app.logger.error(f"Error invoking agent for user {user_email}: {e}")
         return jsonify({"error": "Error processing request"}), 500

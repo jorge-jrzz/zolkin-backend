@@ -13,9 +13,7 @@ __all__ = ["get_google_toolkit", "MilvusStorage"]
 
 
 def get_google_toolkit(credentials: Credentials) -> List[Any]:
-    print("Getting Google Toolkit")
-    print(credentials)
-    print("-" * 10)
+    """Get Google toolkit."""
     gmail_resource = build_resource_service(
         credentials=credentials, service_name="gmail", service_version="v1"
     )
