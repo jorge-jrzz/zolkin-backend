@@ -26,21 +26,18 @@ def get_google_creds(
     """
     creds = None
     if token_file.exists():
-        creds = Credentials.from_authorized_user_file(str(token_file.resolve()), scopes)
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            creds = Credentials(
-                token=token_data.get("access_token"),
-                refresh_token=token_data.get("refresh_token"),
-                client_id=os.getenv("GOOGLE_CLIENT_ID"),
-                client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
-                token_uri="https://oauth2.googleapis.com/token",
-                scopes=scopes,
-                expiry=datetime.now(UTC) + timedelta(seconds=token_data.get("expires_in")),
-            )
-        with open(token_file, "w", encoding="utf-8") as file:
-            file.write(creds.to_json())
+        # Borrar el archivo de token si ya existe, por si ha caducado
+        token_file.unlink()
+    # Generar el token file de nuevo
+    creds = Credentials(
+        token=token_data.get("access_token"),
+        refresh_token=token_data.get("refresh_token"),
+        client_id=os.getenv("GOOGLE_CLIENT_ID"),
+        client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+        token_uri="https://oauth2.googleapis.com/token",
+        scopes=scopes,
+        expiry=datetime.now(UTC) + timedelta(seconds=token_data.get("expires_in")),
+    )
+    with open(token_file, "w", encoding="utf-8") as file:
+        file.write(creds.to_json())
     return creds
