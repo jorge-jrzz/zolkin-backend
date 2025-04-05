@@ -3,13 +3,10 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-Pipfile
-Pipfile.lock
-uv.lock
 .python-version
-pyproject.toml
 
-# virtualenv
+# Virtual environments
+.venv/
 venv/
 .env/
 *.env
@@ -17,9 +14,6 @@ venv/
 
 # Configurations
 .vscode/
-.idea/
-*.iml
-.DS_Store
 
 # Git
 .git/
@@ -27,15 +21,20 @@ venv/
 
 # Docker
 Dockerfile~
-docker-compose.override.yml
+docker-compose.yml
+
+# MacOS stuff
+.DS_Store
 
 # Directories and files without impact on production
 .ruff_cache/
 milvus/
 notebooks/
-pdfs/
-secrets/
+tokens/
 uploads/
 volumes/
 LICENSE
 README.md
+Makefile
+*.key
+*.pem
