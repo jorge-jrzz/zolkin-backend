@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   # Backend Service
   backend:
@@ -6,49 +8,56 @@ services:
       dockerfile: Dockerfile
     container_name: zolkin
     volumes:
-      - files-data:/app/files
+      - ./uploads:/app/uploads
+      - ./tokens:/app/tokens
     ports:
       - "5002:5002"
     env_file:
       - .env
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - MILVUS_URL=http://milvus:19530
+      - BASE_DIR=/app/uploads
     depends_on:
       - redis
       - milvus
     networks:
-      - combined_network
+      - zolkin_network
 
   # Redis Service
   redis:
     image: redis/redis-stack-server:latest
-    container_name: redis
+    container_name: zolkin-redis
     ports:
       - "6379:6379"
+    volumes:
+      - redis-data:/data
     networks:
-      - combined_network
+      - zolkin_network
 
   # Milvus - ETCD Service
   etcd:
-    container_name: milvus-etcd
+    container_name: zolkin-etcd
     image: quay.io/coreos/etcd:v3.5.0
     environment:
       - ETCD_AUTO_COMPACTION_MODE=revision
       - ETCD_AUTO_COMPACTION_RETENTION=1000
       - ETCD_QUOTA_BACKEND_BYTES=4294967296
     volumes:
-      - milvus-data:/volumes/etcd:/etcd
-    command: etcd -advertise-client-urls=http://etcd:2379 -listen-client-urls=http://0.0.0.0:2379 --data-dir /etcd
+      - etcd-data:/etcd
+    command: etcd -advertise-client-urls=http://etcd:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
     networks:
-      - combined_network
+      - zolkin_network
 
   # Milvus - MinIO Service
   minio:
-    container_name: milvus-minio
+    container_name: zolkin-minio
     image: minio/minio:RELEASE.2020-12-03T00-03-10Z
     environment:
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
     volumes:
-      - milvus-data:/volumes/minio:/minio_data
+      - minio-data:/minio_data
     command: minio server /minio_data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
@@ -56,30 +65,32 @@ services:
       timeout: 20s
       retries: 3
     networks:
-      - combined_network
+      - zolkin_network
 
   # Milvus - Standalone Service
   milvus:
-    container_name: milvus
+    container_name: zolkin-milvus
     image: milvusdb/milvus:v2.5.0-beta
     command: ["milvus", "run", "standalone"]
     environment:
       ETCD_ENDPOINTS: etcd:2379
       MINIO_ADDRESS: minio:9000
     volumes:
-      - milvus-data:/volumes/milvus:/var/lib/milvus
+      - milvus-data:/var/lib/milvus
     ports:
       - "19530:19530"
     depends_on:
       - etcd
       - minio
     networks:
-      - combined_network
+      - zolkin_network
 
 volumes:
-  files-data:
+  redis-data:
+  etcd-data:
+  minio-data:
   milvus-data:
 
 networks:
-  combined_network:
+  zolkin_network:
     driver: bridge

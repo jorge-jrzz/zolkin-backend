@@ -1,23 +1,46 @@
-FROM python:3.12-slim
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+
+WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
-    make \
-    pkg-config \
-    gcc \
-    g++ \
     ghostscript \
-    ocrmypdf \
-    tesseract-ocr-spa \
     libreoffice \
     imagemagick \
-    && pip install --upgrade pip
+    tesseract-ocr-spa \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
+
+# Copy from the cache instead of linking since it's a mounted volume
+ENV UV_LINK_MODE=copy
+
+# Install the project's dependencies using the lockfile and settings
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --no-dev
+
+# Then, add the rest of the project source code and install it
+# Installing separately from its dependencies allows optimal layer caching
+ADD . /app
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
+
+# Create directories and set permissions
+RUN mkdir -p /app/uploads/originals /app/uploads/pdfs /app/tokens
 COPY magick_policy.xml /etc/ImageMagick-6/policy.xml
-WORKDIR /app
-COPY app .
 
-RUN pip install --no-cache-dir -r requirements.txt
+# Place executables in the environment at the front of the path
+ENV PATH="/app/.venv/bin:$PATH" \
+    PYTHONPATH=/app \
+    PORT=5002 \
+    HOST=0.0.0.0 \
+    BASE_DIR=/app/uploads/
 
 EXPOSE 5002
 
-CMD ["python", "app.py"]
+ENTRYPOINT []
+
+CMD ["python", "main.py"]
