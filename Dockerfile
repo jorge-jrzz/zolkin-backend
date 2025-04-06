@@ -20,7 +20,7 @@ ENV UV_LINK_MODE=copy
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-project --no-dev --no-dev --no-group calendar-toolkit
+    uv sync --frozen --no-install-project --no-dev --no-group calendar-toolkit
 
 # Then, add the rest of the project source code and install it
 # Installing separately from its dependencies allows optimal layer caching
@@ -33,11 +33,7 @@ RUN mkdir -p /app/uploads/originals /app/uploads/pdfs /app/tokens
 COPY magick_policy.xml /etc/ImageMagick-6/policy.xml
 
 # Place executables in the environment at the front of the path
-ENV PATH="/app/.venv/bin:$PATH" \
-    PYTHONPATH=/app \
-    PORT=5002 \
-    HOST=0.0.0.0 \
-    BASE_DIR=/app/uploads/
+ENV PATH="/app/.venv/bin:$PATH" PYTHONPATH=/app
 
 EXPOSE 5002
 
