@@ -6,7 +6,7 @@ import logging
 from fastapi import APIRouter, HTTPException, Request, Query
 from langchain_core.messages import HumanMessage
 
-from services.agent import AgentManager
+from services import AgentManager
 
 
 logger = logging.getLogger(__name__)

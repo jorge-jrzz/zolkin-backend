@@ -9,8 +9,8 @@ from fastapi.responses import RedirectResponse
 from fastapi import APIRouter, HTTPException, Request
 from authlib.integrations.starlette_client import OAuth, OAuthError
 
-from services import init_agent
-from services.auth import GoogleAuthManager, UserManager
+from services import GoogleAuthManager, UserManager
+from ..init_agent import init_agent
 
 
 logger = logging.getLogger(__name__)

@@ -8,8 +8,8 @@ from pathlib import Path
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter, HTTPException, Request, UploadFile, File, Form
 
+from services import secure_filename
 from ..file_to_rag import upsert_file_to_rag
-from services.files import secure_filename
 
 
 logger = logging.getLogger(__name__)

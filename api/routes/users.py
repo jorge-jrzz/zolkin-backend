@@ -6,7 +6,7 @@ from typing import Dict, Any
 
 from fastapi import APIRouter, HTTPException, Request
 
-from services.auth import UserManager
+from services import UserManager
 
 
 logger = logging.getLogger(__name__)
