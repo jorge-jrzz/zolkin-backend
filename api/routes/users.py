@@ -6,7 +6,7 @@ from typing import Dict, Any
 
 from fastapi import APIRouter, HTTPException, Request
 
-from services.auth import UserManager, get_user
+from services.auth import UserManager
 
 
 logger = logging.getLogger(__name__)
@@ -42,10 +42,6 @@ async def user_info(request: Request) -> Dict[str, Any]:
     
     # Intentar obtener el usuario del gestor de usuarios
     user = user_manager.get_user(user_email)
-    
-    # Si no se encuentra en el gestor, intentar con la función legacy
-    if user is None:
-        user = get_user(user_email)
     
     if user is None:
         logger.error(f"Usuario no encontrado para el email: {user_email}")

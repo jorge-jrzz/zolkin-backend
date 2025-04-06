@@ -19,8 +19,8 @@ def create_app() -> FastAPI:
     # Crear la aplicación FastAPI
     app = FastAPI(
         title="Zolkin API",
-        description="API para el asistente Zolkin con integración de Google y RAG",
-        version="1.0.0",
+        description="API para el asistente Zolkin con Herramientas de Google y RAG",
+        version="0.2.0",
     )
     
     # Configurar middleware de sesiones
