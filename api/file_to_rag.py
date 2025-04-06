@@ -4,9 +4,12 @@ from pathlib import Path
 
 from fastapi import HTTPException
 
-from services import get_milvus_conn
-from services.agent import AgentManager
-from services.files import OCRProcessor, manage_files
+from services import (
+    AgentManager,
+    OCRProcessor,
+    manage_files,
+    get_milvus_conn,
+)
 
 
 logger = logging.getLogger(__name__)
