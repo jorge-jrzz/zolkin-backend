@@ -21,10 +21,17 @@ dependencies = [
     "python-dotenv>=1.1.0",
     "python-multipart>=0.0.20",
     "redis>=5.2.1",
+    "starlette>=0.46.1",
     "uvicorn>=0.34.0",
 ]
 
 [dependency-groups]
+calendar-toolkit = [
+    "google-api-python-client>=2.166.0",
+    "google-auth>=2.38.0",
+    "google-auth-httplib2>=0.2.0",
+    "google-auth-oauthlib>=1.2.1",
+]
 dev = [
     "ipykernel>=6.29.5",
     "ruff>=0.9.9",
