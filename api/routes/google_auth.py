@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 # Crear el router
 router = APIRouter(prefix="/google", tags=["google"])
 
-config = Config('.env')
+config = Config()
 oauth = OAuth(config)
 
 # Definir los scopes necesarios para Google

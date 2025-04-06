@@ -6,6 +6,8 @@ avoiding unnecessary recreation.
 import logging
 from typing import Any, Dict, Optional
 
+from .zolkin import ZolkinAgent
+
 
 logger = logging.getLogger(__name__)
 

@@ -17,7 +17,8 @@ from google.oauth2.credentials import Credentials
 from langgraph.prebuilt import create_react_agent
 
 from .memory import RedisSaver
-from .google_tools import MilvusStorage, get_google_toolkit
+from .milvus_storage import MilvusStorage
+from .google_tools import get_google_toolkit
 
 
 logger = logging.getLogger(__name__)
