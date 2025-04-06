@@ -6,10 +6,8 @@ import logging
 
 import uvicorn
 from dotenv import load_dotenv
-from fastapi.middleware.cors import CORSMiddleware
 
 from api import create_app
-
 
 
 logging.basicConfig(
@@ -20,21 +18,13 @@ logger = logging.getLogger(__name__)
 
 logger.info("Starting Zolkin API...")
 load_dotenv()
-app = create_app()
-
 
 origins = [
     os.getenv("FRONTEND_URL", "http://localhost:3000"),
     "https://zolkin.vercel.app",
 ]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app = create_app(origins)
 
 
 @app.get("/")
@@ -43,7 +33,7 @@ async def health_check():
     return {
         "status": "healthy", 
         "service": "Zolkin API",
-        "version": "1.0.0"
+        "version": "0.2.0"
     }
 
 

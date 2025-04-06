@@ -10,6 +10,7 @@ from fastapi import APIRouter, HTTPException, Request
 from authlib.integrations.starlette_client import OAuth, OAuthError
 
 from services import GoogleAuthManager, UserManager
+from ..utils import ensure_ssl_for_ngrok
 from ..init_agent import init_agent
 
 
@@ -62,6 +63,9 @@ async def google_login(request: Request):
         
         # Generar la URL de redirección
         redirect_uri = request.url_for("google_auth")
+        
+        # Forzar HTTPS si estamos usando ngrok
+        redirect_uri = ensure_ssl_for_ngrok(redirect_uri)
         
         # Iniciar el flujo de OAuth2
         return await oauth.google.authorize_redirect(
@@ -133,8 +137,12 @@ async def google_auth(request: Request):
         
         # Guardar información del usuario
         user_manager.set_user(user_email, user_info_data)
+        
+        # Establecer la sesión de manera explícita
+        request.session.clear()
         request.session["user_email"] = user_email
-
+        request.session["authenticated"] = True
+        
         # Inicializamos el agente Zolkin
         init_agent(user_email, credentials)
         logger.info(f"Agente y datos de usuario configurados para: {user_email}")
