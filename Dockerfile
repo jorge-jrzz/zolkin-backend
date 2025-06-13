@@ -30,6 +30,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 # Create directories and set permissions
 RUN mkdir -p /app/uploads/originals /app/uploads/pdfs /app/tokens
+# Set permissions for the ImageMagick policy file
 COPY magick_policy.xml /etc/ImageMagick-6/policy.xml
 
 # Place executables in the environment at the front of the path
